@@ -1,0 +1,30 @@
+{
+    "name": "wikilink-server",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc",
+        "clean": "rm -rf .vercel .next dist"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "@types/express": "^5.0.3",
+        "@upstash/redis": "^1.35.1",
+        "@vercel/node": "^5.3.4",
+        "dotenv": "^17.2.0",
+        "express": "^5.1.0",
+        "serverless-http": "^3.2.0",
+        "uuid": "^11.1.0",
+        "vercel": "^44.3.0"
+    },
+    "devDependencies": {
+        "@types/node": "^24.0.10",
+        "concurrently": "^9.2.0",
+        "nodemon": "^3.1.10",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.3"
+    }
+}
