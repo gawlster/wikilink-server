@@ -3,6 +3,7 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 
 export async function POST(req: VercelRequest, res: VercelResponse) {
     try {
+        console.log("inrequest");
         const game = await createGame();
         res.status(200).json(game);
     } catch (error) {
