@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { deleteGame } from "../game";
 
-export async function DELETE(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { gameId } = req.body;
     try {
         if (!gameId) {

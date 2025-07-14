@@ -2,7 +2,7 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import { getGameFromId, saveGame } from "../game";
 import { areArticlesTheSame, getOutgoingArticleUrls } from "../wikipediaUtils";
 
-export async function POST(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { gameId, oldPageUrl, newPageUrl } = req.body;
     try {
         if (!gameId || !oldPageUrl || !newPageUrl) {
