@@ -1,8 +1,10 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { getGameFromId, saveGame } from "../game";
 import { areArticlesTheSame, getOutgoingArticleUrls } from "../wikipediaUtils";
+import { handleCORS } from "../serverUtils";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+    handleCORS(req, res);
     const { gameId, oldPageUrl, newPageUrl } = req.body;
     try {
         if (!gameId || !oldPageUrl || !newPageUrl) {
