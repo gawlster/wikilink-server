@@ -1,6 +1,6 @@
-import { createGame } from "../game";
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCORS } from "../serverUtils";
+import { handleCORS } from "../../serverUtils";
+import { createActiveGame } from "../../utils/game";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     const shouldReturn = handleCORS(req, res);
@@ -8,7 +8,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return;
     }
     try {
-        const game = await createGame();
+        const game = await createActiveGame();
         res.status(200).json(game);
     } catch (error) {
         console.error("Error starting game:", error);
