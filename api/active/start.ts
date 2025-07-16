@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCORS } from "../../serverUtils";
-import { createActiveGame } from "../../utils/game";
+import { handleCORS } from "../../utils/serverUtils";
+import { createActiveGame } from "../../utils/activeGame";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     const shouldReturn = handleCORS(req, res);

@@ -52,6 +52,8 @@ async function walkRandomPath(startUrl: string, steps: number): Promise<string> 
         currentUrl = candidates[Math.floor(Math.random() * candidates.length)];
     }
 
+    console.log(visited);
+
     return currentUrl;
 }
 

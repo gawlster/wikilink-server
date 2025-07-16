@@ -18,7 +18,7 @@ function isValidCompletedGame(game: any): game is CompletedGame {
         typeof game.endingArticleUrl === 'string' &&
         typeof game.minSteps === 'number' &&
         Array.isArray(game.steps) &&
-        game.steps.every(step => typeof step === 'string') &&
+        (game.steps as any[]).every(step => typeof step === 'string') &&
         typeof game.completedAt === 'string'
     );
 }

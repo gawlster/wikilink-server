@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCORS } from "../../serverUtils";
+import { handleCORS } from "../../utils/serverUtils";
 import { deleteActiveGame } from "../../utils/activeGame";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
