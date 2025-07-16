@@ -1,10 +1,14 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCORS } from "../../utils/serverUtils";
+import { handleCORS, handleProtectedAuth } from "../../utils/serverUtils";
 import { deleteActiveGame } from "../../utils/activeGame";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     const shouldReturn = handleCORS(req, res);
     if (shouldReturn) {
+        return;
+    }
+    const badAuth = handleProtectedAuth(req, res);
+    if (badAuth) {
         return;
     }
     const { id } = req.body;

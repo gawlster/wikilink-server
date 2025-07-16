@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCORS } from "../../utils/serverUtils";
+import { handleCORS, handleProtectedAuth } from "../../utils/serverUtils";
 import { deleteActiveGame, getActiveGameFromId } from "../../utils/activeGame";
 import { areArticlesTheSame, getOutgoingArticleUrls } from "../../utils/wikipediaUtils";
 import { createCompletedGame } from "../../utils/completedGame";
@@ -21,6 +21,10 @@ function isValidBody(body: any): body is Body {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     const shouldReturn = handleCORS(req, res);
     if (shouldReturn) {
+        return;
+    }
+    const badAuth = handleProtectedAuth(req, res);
+    if (badAuth) {
         return;
     }
     if (!isValidBody(req.body)) {

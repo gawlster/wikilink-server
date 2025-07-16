@@ -2,8 +2,7 @@
     "name": "wikilink-server",
     "version": "1.0.0",
     "main": "index.js",
-    "scripts": {
-    },
+    "scripts": {},
     "keywords": [],
     "author": "",
     "license": "ISC",
@@ -12,13 +11,16 @@
         "@types/express": "^5.0.3",
         "@upstash/redis": "^1.35.1",
         "@vercel/node": "^5.3.4",
+        "bcryptjs": "^3.0.2",
         "dotenv": "^17.2.0",
         "express": "^5.1.0",
+        "jsonwebtoken": "^9.0.2",
         "serverless-http": "^3.2.0",
         "uuid": "^11.1.0",
         "vercel": "^44.3.0"
     },
     "devDependencies": {
+        "@types/jsonwebtoken": "^9.0.10",
         "@types/node": "^24.0.10",
         "concurrently": "^9.2.0",
         "nodemon": "^3.1.10",
