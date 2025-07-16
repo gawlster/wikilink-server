@@ -4,7 +4,10 @@ import { areArticlesTheSame, getOutgoingArticleUrls } from "../wikipediaUtils";
 import { handleCORS } from "../serverUtils";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-    handleCORS(req, res);
+    const shouldReturn = handleCORS(req, res);
+    if (shouldReturn) {
+        return;
+    }
     const { gameId, oldPageUrl, newPageUrl } = req.body;
     try {
         if (!gameId || !oldPageUrl || !newPageUrl) {
@@ -33,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         await saveGame(game);
 
-        res.status(200).json({ game });
+        res.status(200).json(game);
     } catch (error) {
         console.error("Error navigating link:", error);
         res.status(500).json({ error: "Failed to navigate link" });

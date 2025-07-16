@@ -3,7 +3,10 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import { handleCORS } from "../serverUtils";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-    handleCORS(req, res);
+    const shouldReturn = handleCORS(req, res);
+    if (shouldReturn) {
+        return;
+    }
     try {
         const game = await createGame();
         res.status(200).json(game);
