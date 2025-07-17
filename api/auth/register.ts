@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCORS } from "../../utils/serverUtils";
+import { handleCORS, setTokenHeaders } from "../../utils/serverUtils";
 import { createUser, getUserFromEmail } from "../../utils/user";
-import { generateToken } from "../../utils/auth";
+import { generateTokens } from "../../utils/auth";
 
 type Body = {
     password: string;
@@ -47,7 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const user = await createUser(email, password);
-    const token = generateToken(user.id);
-    res.setHeader("Authorization", `Bearer ${token}`);
+    const { accessToken, refreshToken } = generateTokens(user.id);
+    setTokenHeaders(res, accessToken, refreshToken);
     res.status(200).json({});
 }

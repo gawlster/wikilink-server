@@ -7,6 +7,7 @@ export type CompletedGame = {
     endingArticleUrl: string;
     minSteps: number;
     steps: string[];
+    userId: string;
     completedAt: string; // ISO date string
 };
 function isValidCompletedGame(game: any): game is CompletedGame {
@@ -19,6 +20,7 @@ function isValidCompletedGame(game: any): game is CompletedGame {
         typeof game.minSteps === 'number' &&
         Array.isArray(game.steps) &&
         (game.steps as any[]).every(step => typeof step === 'string') &&
+        typeof game.userId === 'string' &&
         typeof game.completedAt === 'string'
     );
 }
@@ -30,6 +32,7 @@ export async function createCompletedGame(activeGame: ActiveGame, steps: string[
         endingArticleUrl: activeGame.endingArticleUrl,
         minSteps: activeGame.minSteps,
         steps,
+        userId: activeGame.userId,
         completedAt: new Date().toISOString(),
     };
     await saveCompletedGame(completedGame);

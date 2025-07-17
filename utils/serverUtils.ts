@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { verifyTokenAndGenerateNew } from "./auth";
+import { verifyTokens } from "./auth";
 
 export function handleCORS(req: VercelRequest, res: VercelResponse) {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -14,19 +14,21 @@ export function handleCORS(req: VercelRequest, res: VercelResponse) {
     return false;
 }
 
-export function handleProtectedAuth(req: VercelRequest, res: VercelResponse) {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-        console.log("No token provided");
-        res.status(401).json({ error: "No token provided" });
-        return true;
+export async function handleProtectedAuth(req: VercelRequest, res: VercelResponse) {
+    const accessToken = req.headers.authorization?.split(" ")[1] || "";
+    const refreshToken = req.headers["x-refresh-token"] || "";
+    const validated = await verifyTokens({ accessToken, refreshToken: String(refreshToken) })
+    if (!validated) {
+        res.status(401).json({ error: "Unauthorized" });
+        return null;
     }
-    const newToken = verifyTokenAndGenerateNew(token);
-    if (!newToken) {
-        console.log("Invalid token");
-        res.status(401).json({ error: "Invalid token" });
-        return true;
-    }
-    res.setHeader("Authorization", `Bearer ${newToken}`);
-    return false;
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken, userId } = validated;
+    res.setHeader("Authorization", `Bearer ${newAccessToken}`);
+    res.setHeader("x-refresh-token", newRefreshToken)
+    return userId;
+}
+
+export function setTokenHeaders(res: VercelResponse, accessToken: string, refreshToken: string) {
+    res.setHeader("Authorization", `Bearer ${accessToken}`);
+    res.setHeader("x-refresh-token", refreshToken);
 }

@@ -7,6 +7,7 @@ export type ActiveGame = {
     startingArticleUrl: string;
     endingArticleUrl: string;
     minSteps: number;
+    userId: string;
 }
 function isValidActiveGame(game: any): game is ActiveGame {
     return (
@@ -15,17 +16,19 @@ function isValidActiveGame(game: any): game is ActiveGame {
         typeof game.id === 'string' &&
         typeof game.startingArticleUrl === 'string' &&
         typeof game.endingArticleUrl === 'string' &&
-        typeof game.minSteps === 'number'
+        typeof game.minSteps === 'number' &&
+        typeof game.userId === 'string'
     )
 }
 
-export async function createActiveGame(): Promise<ActiveGame> {
+export async function createActiveGame(userId: string): Promise<ActiveGame> {
     const { startingArticleUrl, endingArticleUrl, minSteps } = await getRandomStartAndEnd();
     const game: ActiveGame = {
         id: uuidv4(),
         startingArticleUrl,
         endingArticleUrl,
         minSteps,
+        userId
     };
     await saveActiveGame(game);
     return game;

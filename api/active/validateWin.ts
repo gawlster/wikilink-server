@@ -23,9 +23,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (shouldReturn) {
         return;
     }
-    const badAuth = handleProtectedAuth(req, res);
-    if (badAuth) {
-        return;
+    const userId = await handleProtectedAuth(req, res);
+    if (!userId) {
+        return; // handleProtectedAuth already sends a VercelResponse
     }
     if (!isValidBody(req.body)) {
         console.log("Checking body")
@@ -37,6 +37,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!activeGame) {
         console.log("Active game not found for id:", id);
         res.status(404).json({ error: "Active game not found" });
+        return;
+    }
+    if (activeGame.userId !== userId) {
+        console.log("User does not have permission to validate this game");
+        res.status(403).json({ error: "Forbidden: You do not have permission to validate this game" });
         return;
     }
     if (!areArticlesTheSame(activeGame.startingArticleUrl, visitedUrls[0])) {

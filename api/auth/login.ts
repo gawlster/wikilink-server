@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCORS } from "../../utils/serverUtils";
+import { handleCORS, setTokenHeaders } from "../../utils/serverUtils";
 import { getUserFromEmail, isPasswordValid } from "../../utils/user";
-import { generateToken } from "../../utils/auth";
+import { generateTokens } from "../../utils/auth";
 
 type Body = {
     email: string;
@@ -39,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(401).json({ error: "Invalid password" });
         return;
     }
-    const token = generateToken(user.id);
-    res.setHeader("Authorization", `Bearer ${token}`);
+    const { accessToken, refreshToken } = generateTokens(user.id);
+    setTokenHeaders(res, accessToken, refreshToken);
     res.status(200).json({});
 }

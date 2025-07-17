@@ -7,12 +7,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (badCors) {
         return;
     }
-    const badAuth = handleProtectedAuth(req, res);
-    if (badAuth) {
-        return;
+    const userId = await handleProtectedAuth(req, res);
+    if (!userId) {
+        return; // handleProtectedAuth already sends a VercelResponse
     }
     try {
-        const game = await createActiveGame();
+        const game = await createActiveGame(userId);
         res.status(200).json(game);
     } catch (error) {
         console.error("Error starting game:", error);
