@@ -12,7 +12,7 @@ function generateAccessToken(userId: string): string {
     return token;
 }
 
-function generateRefreshToken(userId: string): string {
+async function generateRefreshToken(userId: string): Promise<string> {
     const secret = process.env.JWT_REFRESH_SECRET;
     if (!secret) {
         throw new Error("JWT refresh secret is not defined");
@@ -20,12 +20,13 @@ function generateRefreshToken(userId: string): string {
     const token = jwt.sign({ id: userId }, process.env.JWT_REFRESH_SECRET as string, {
         expiresIn: '7d'
     });
+    await redis.set(`refreshToken:${token}`, userId, { ex: 60 * 60 * 24 * 7 });
     return token;
 }
 
-export function generateTokens(userId: string): { accessToken: string; refreshToken: string } {
+export async function generateTokens(userId: string): Promise<{ accessToken: string; refreshToken: string }> {
     const accessToken = generateAccessToken(userId);
-    const refreshToken = generateRefreshToken(userId);
+    const refreshToken = await generateRefreshToken(userId);
     return { accessToken, refreshToken };
 }
 
@@ -44,7 +45,7 @@ export async function verifyTokens(tokens: { accessToken: string; refreshToken: 
             userId: decodedAccessToken.id
         };
     } catch (accessError) {
-        if (accessError.name !== 'TokenExpiredError') {
+        if (!(accessError instanceof Error) || accessError.name !== 'TokenExpiredError') {
             console.error("Invalid access token", accessError);
             return null;
         }
@@ -56,9 +57,8 @@ export async function verifyTokens(tokens: { accessToken: string; refreshToken: 
             }
             const decodedRefreshToken = jwt.verify(tokens.refreshToken, refreshSecret) as { id: string };
             const newAccessToken = generateAccessToken(decodedRefreshToken.id);
-            const newRefreshToken = generateRefreshToken(decodedRefreshToken.id);
+            const newRefreshToken = await generateRefreshToken(decodedRefreshToken.id);
             await redis.del(`refreshToken:${tokens.refreshToken}`);
-            await redis.set(`refreshToken:${newRefreshToken}`, decodedRefreshToken.id, { ex: 60 * 60 * 24 * 7 });
             return { accessToken: newAccessToken, refreshToken: newRefreshToken, userId: decodedRefreshToken.id };
         } catch (refreshError) {
             console.error("Invalid tokens", accessError, refreshError);

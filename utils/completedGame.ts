@@ -47,7 +47,7 @@ export async function saveCompletedGame(game: CompletedGame): Promise<void> {
 export async function getCompletedGameFromId(gameId: string) {
     const raw = await redis.get(`completedGame:${gameId}`);
     if (typeof raw !== "object" || raw === null || !isValidCompletedGame(raw)) {
-        throw new Error(`Game with ID ${gameId} not found or malformed`);
+        throw new Error(`Completed game with ID ${gameId} not found or malformed`);
     }
     return raw as CompletedGame;
 }

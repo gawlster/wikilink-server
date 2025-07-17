@@ -36,18 +36,18 @@ export async function createActiveGame(userId: string): Promise<ActiveGame> {
 
 export async function saveActiveGame(game: ActiveGame): Promise<void> {
     await redis.set(`activeGame:${game.id}`, JSON.stringify(game), { ex: 3600 });
-    console.log(`Game saved: ${JSON.stringify(game)}`);
+    console.log(`Active game saved: ${JSON.stringify(game)}`);
 }
 
 export async function getActiveGameFromId(gameId: string) {
     const raw = await redis.get(`activeGame:${gameId}`);
     if (typeof raw !== "object" || raw === null || !isValidActiveGame(raw)) {
-        throw new Error(`Game with ID ${gameId} not found or malformed`);
+        throw new Error(`Active game with ID ${gameId} not found or malformed`);
     }
     return raw as ActiveGame;
 }
 
 export async function deleteActiveGame(gameId: string): Promise<void> {
     await redis.del(`activeGame:${gameId}`);
-    console.log(`Game deleted: ${gameId}`);
+    console.log(`Active game deleted: ${gameId}`);
 }

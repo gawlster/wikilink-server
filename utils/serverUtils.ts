@@ -4,7 +4,9 @@ import { verifyTokens } from "./auth";
 export function handleCORS(req: VercelRequest, res: VercelResponse) {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-refresh-token");
+    res.setHeader("Access-Control-Expose-Headers", "Authorization, x-refresh-token");
+
 
     // Handle preflight request
     if (req.method === "OPTIONS") {
@@ -19,6 +21,7 @@ export async function handleProtectedAuth(req: VercelRequest, res: VercelRespons
     const refreshToken = req.headers["x-refresh-token"] || "";
     const validated = await verifyTokens({ accessToken, refreshToken: String(refreshToken) })
     if (!validated) {
+        setTokenHeaders(res, "", "");
         res.status(401).json({ error: "Unauthorized" });
         return null;
     }

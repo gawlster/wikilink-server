@@ -39,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(401).json({ error: "Invalid password" });
         return;
     }
-    const { accessToken, refreshToken } = generateTokens(user.id);
+    const { accessToken, refreshToken } = await generateTokens(user.id);
     setTokenHeaders(res, accessToken, refreshToken);
     res.status(200).json({});
 }
