@@ -11,25 +11,58 @@ function getTitleFromUrl(url: string): string {
     return decodeURIComponent(parts[1] || "");
 }
 
+type WikipediaLinkResponse = {
+    query: {
+        pages: {
+            [pageId: string]: {
+                links?: { title: string }[];
+            };
+        };
+    };
+    continue?: {
+        plcontinue: string;
+    };
+}
+
 /**
  * Get outgoing article URLs linked from a given Wikipedia page.
  */
 export async function getOutgoingArticleUrls(articleUrl: string): Promise<string[]> {
     const articleTitle = getTitleFromUrl(articleUrl);
+    const baseUrl = `https://en.wikipedia.org/w/api.php`;
+    const allLinks: string[] = [];
+    let plcontinue: string | undefined;
 
-    const apiUrl = `https://en.wikipedia.org/w/api.php` +
-        `?action=query&prop=links&pllimit=max&format=json&origin=*` +
-        `&titles=${encodeURIComponent(articleTitle)}`;
+    do {
+        const params = new URLSearchParams({
+            action: "query",
+            prop: "links",
+            pllimit: "max",
+            format: "json",
+            origin: "*",
+            titles: articleTitle,
+        });
 
-    const res = await fetch(apiUrl);
-    const data = await res.json() as { query: { pages: { links?: { title: string }[] }[] } };
+        if (plcontinue) {
+            params.set("plcontinue", plcontinue);
+        }
 
-    const page = Object.values(data.query.pages)[0];
-    const links = page.links ?? [];
+        const res = await fetch(`${baseUrl}?${params}`);
+        const data = await res.json() as WikipediaLinkResponse;
 
-    return links
-        .filter(link => !link.title.startsWith("List of") && !link.title.includes(":"))
-        .map(link => `https://en.wikipedia.org/wiki/${encodeURIComponent(link.title)}`);
+        const page = Object.values(data.query.pages)[0] as { links?: { title: string }[] };
+        const links = page.links ?? [];
+
+        for (const link of links) {
+            if (!link.title.startsWith("List of") && !link.title.includes(":")) {
+                allLinks.push(`https://en.wikipedia.org/wiki/${encodeURIComponent(link.title)}`);
+            }
+        }
+
+        plcontinue = data.continue?.plcontinue;
+    } while (plcontinue);
+
+    return allLinks;
 }
 
 /**
@@ -46,6 +79,7 @@ async function walkRandomPath(startUrl: string, steps: number): Promise<string> 
         const candidates = links.filter(url => !visited.has(url));
 
         if (candidates.length === 0) {
+            console.log(`Dead end at step ${i} for URL: ${currentUrl}`);
             throw new Error(`Dead end after ${i} steps at ${currentUrl}`);
         }
 
@@ -90,6 +124,7 @@ export async function getRandomStartAndEnd(): Promise<{ startingArticleUrl: stri
 function getNormalizedTitle(url: string): string {
     const parts = url.split("/wiki/");
     if (parts.length < 2) {
+        console.log(`Invalid Wikipedia URL: ${url}`);
         throw new Error(`Invalid Wikipedia URL: ${url}`);
     }
     // Decode and convert underscores to spaces

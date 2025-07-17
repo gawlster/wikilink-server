@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { getRandomStartAndEnd } from "./wikipediaUtils";
 import { redis } from './redis';
+import { getSeededGameFromId } from './seededGame';
 
 export type ActiveGame = {
     id: string;
@@ -8,6 +9,7 @@ export type ActiveGame = {
     endingArticleUrl: string;
     minSteps: number;
     userId: string;
+    createdFromSeed?: string;
 }
 function isValidActiveGame(game: any): game is ActiveGame {
     return (
@@ -34,6 +36,20 @@ export async function createActiveGame(userId: string): Promise<ActiveGame> {
     return game;
 }
 
+export async function createActiveGameFromSeed(userId: string, seedId: string): Promise<ActiveGame> {
+    const seededGame = await getSeededGameFromId(seedId);
+    const game: ActiveGame = {
+        id: uuidv4(),
+        startingArticleUrl: seededGame.startingArticleUrl,
+        endingArticleUrl: seededGame.endingArticleUrl,
+        minSteps: seededGame.minSteps,
+        userId,
+        createdFromSeed: seedId
+    }
+    await saveActiveGame(game);
+    return game;
+}
+
 export async function saveActiveGame(game: ActiveGame): Promise<void> {
     await redis.set(`activeGame:${game.id}`, JSON.stringify(game), { ex: 3600 });
     console.log(`Active game saved: ${JSON.stringify(game)}`);
@@ -42,6 +58,7 @@ export async function saveActiveGame(game: ActiveGame): Promise<void> {
 export async function getActiveGameFromId(gameId: string) {
     const raw = await redis.get(`activeGame:${gameId}`);
     if (typeof raw !== "object" || raw === null || !isValidActiveGame(raw)) {
+        console.log(`Active game with ID ${gameId} not found or malformed`);
         throw new Error(`Active game with ID ${gameId} not found or malformed`);
     }
     return raw as ActiveGame;

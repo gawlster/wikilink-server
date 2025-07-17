@@ -39,6 +39,7 @@ export async function getUserFromId(id: string) {
     const raw = await redis.get(`user:${id}`);
     console.log(`Raw user data for ID ${id}:`, raw);
     if (typeof raw !== "object" || raw === null || !isValidUser(raw)) {
+        console.log(`User with ID ${id} not found or malformed`);
         throw new Error(`User with ID ${id} not found or malformed`);
     }
     return raw as User;
