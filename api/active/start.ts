@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { handleCORS, handleProtectedAuth } from "../../utils/serverUtils";
-import { createActiveGame } from "../../utils/activeGame";
+import { createActiveGame, deleteActiveGame, getAllActiveGamesForUser } from "../../utils/activeGame";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     const badCors = handleCORS(req, res);
@@ -10,6 +10,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const userId = await handleProtectedAuth(req, res);
     if (!userId) {
         return; // handleProtectedAuth already sends a VercelResponse
+    }
+    try {
+        const activeGames = await getAllActiveGamesForUser(userId);
+        for (const game of activeGames) {
+            await deleteActiveGame(game.id);
+        }
+    } catch (error) {
+        console.log("Error searching for existing active games for user while trying to start new game: ", error);
     }
     try {
         const game = await createActiveGame(userId);

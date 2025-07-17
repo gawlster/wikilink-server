@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { ActiveGame } from "./activeGame";
 import { redis } from './redis';
+import { CompletedGame } from './completedGame';
 
 export enum CATEGORY {
     RANDOM = "random",
@@ -37,7 +37,7 @@ export async function createSeededGame(startingArticleUrl: string, endingArticle
     return seededGame;
 }
 
-export async function createSeededGameFromActiveGame(game: ActiveGame) {
+export async function createSeededGameFromCompletedGame(game: CompletedGame) {
     const seededGame: SeededGame = {
         id: uuidv4(),
         startingArticleUrl: game.startingArticleUrl,

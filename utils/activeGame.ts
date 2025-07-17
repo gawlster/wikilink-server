@@ -64,6 +64,19 @@ export async function getActiveGameFromId(gameId: string) {
     return raw as ActiveGame;
 }
 
+export async function getAllActiveGamesForUser(userId: string): Promise<ActiveGame[]> {
+    const keys = await redis.keys(`activeGame:*`);
+    const activeGames: ActiveGame[] = [];
+    for (const key of keys) {
+        const gameId = key.split(':')[1];
+        const game = await getActiveGameFromId(gameId);
+        if (game.userId === userId) {
+            activeGames.push(game);
+        }
+    }
+    return activeGames;
+}
+
 export async function deleteActiveGame(gameId: string): Promise<void> {
     await redis.del(`activeGame:${gameId}`);
     console.log(`Active game deleted: ${gameId}`);

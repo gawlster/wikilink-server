@@ -9,6 +9,7 @@ export type CompletedGame = {
     steps: string[];
     userId: string;
     completedAt: string; // ISO date string
+    createdFromSeed?: string;
 };
 function isValidCompletedGame(game: any): game is CompletedGame {
     return (
@@ -34,6 +35,7 @@ export async function createCompletedGame(activeGame: ActiveGame, steps: string[
         steps,
         userId: activeGame.userId,
         completedAt: new Date().toISOString(),
+        createdFromSeed: activeGame.createdFromSeed,
     };
     await saveCompletedGame(completedGame);
     return completedGame;
