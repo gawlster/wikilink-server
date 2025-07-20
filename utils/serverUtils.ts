@@ -4,7 +4,15 @@ import { verifyTokens } from "./auth";
 export function handleCORS(req: VercelRequest, res: VercelResponse) {
     const devExtensionId = "jjpkkoobpafpdfaimchlkilemkophakp";
     const prodExtensionId = "emkinglnjogipkbdaolejamloekkjboj";
-    res.setHeader("Access-Control-Allow-Origin", `chrome - extension://${devExtensionId},chrome-extension://${prodExtensionId}`);
+    const requestOrigin = req.headers.origin;
+    if (!requestOrigin) {
+        return false;
+    }
+    if (requestOrigin.endsWith(devExtensionId)) {
+        res.setHeader("Access-Control-Allow-Origin", `chrome-extension://${devExtensionId}`);
+    } else if (requestOrigin.endsWith(prodExtensionId)) {
+        res.setHeader("Access-Control-Allow-Origin", `chrome-extension://${prodExtensionId}`);
+    }
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-refresh-token");
     res.setHeader("Access-Control-Expose-Headers", "Authorization, x-refresh-token");

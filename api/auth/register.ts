@@ -2,6 +2,7 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import { handleCORS, setTokenHeaders } from "../../utils/serverUtils";
 import { createUser, getUserFromEmail } from "../../utils/user";
 import { generateTokens } from "../../utils/auth";
+import validateEmail from "node-email-verifier";
 
 type Body = {
     password: string;
@@ -43,6 +44,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (existingUser) {
         console.log("User with this email already exists");
         res.status(400).json({ message: "User with this email already exists" });
+        return;
+    }
+
+    try {
+        const isValidEmail = await validateEmail(email);
+        if (!isValidEmail) {
+            throw new Error();
+        }
+    } catch (error) {
+        console.log("Invalid email address during registration: ", email);
+        res.status(400).json({ message: "Invalid email address" });
+        return;
+    }
+
+    if (password.length < 8) {
+        console.log("Password must be at least 8 characters long");
+        res.status(400).json({ message: "Password must be at least 8 characters long" });
         return;
     }
 
