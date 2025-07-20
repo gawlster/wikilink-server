@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { handleCORS, handleProtectedAuth } from "../../utils/serverUtils";
 import { createActiveGameFromSeed } from "../../utils/activeGame";
+import { getSeededGameFromId } from "../../utils/seededGame";
 
 type Body = {
     seedId: string;
@@ -27,6 +28,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return;
     }
     const { seedId } = req.body;
+    try {
+        await getSeededGameFromId(seedId);
+    } catch (error) {
+        res.status(400).json({ message: "Invalid seed ID" });
+    }
     try {
         const game = await createActiveGameFromSeed(userId, seedId);
         res.status(200).json(game);
