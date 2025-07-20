@@ -58,12 +58,20 @@ export async function verifyTokens(tokens: { accessToken: string; refreshToken: 
             const decodedRefreshToken = jwt.verify(tokens.refreshToken, refreshSecret) as { id: string };
             const newAccessToken = generateAccessToken(decodedRefreshToken.id);
             const newRefreshToken = await generateRefreshToken(decodedRefreshToken.id);
-            await redis.del(`refreshToken:${tokens.refreshToken}`);
+            await invalidateRefreshToken(tokens.refreshToken);
             return { accessToken: newAccessToken, refreshToken: newRefreshToken, userId: decodedRefreshToken.id };
         } catch (refreshError) {
             console.error("Invalid tokens", accessError, refreshError);
             return null;
         }
+    }
+}
+
+export async function invalidateRefreshToken(token: string): Promise<void> {
+    try {
+        await redis.del(`refreshToken:${token}`);
+    } catch (error) {
+        console.error("Tried to delete invalid refresh token", error);
     }
 }
 
