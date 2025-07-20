@@ -4,6 +4,7 @@
 
 - [Privacy Policy](https://github.com/gawlster/wikilink-privacy)
 - [Available on the Chrome Web Store](https://chromewebstore.google.com/detail/wikilink/emkinglnjogipkbdaolejamloekkjboj)
+- To provide feedback, report bugs, or suggest features, please fill out [this form](https://forms.gle/4xWNBD1PoE6n5qwz8)
 
 ## 🛠️ Development Setup
 
