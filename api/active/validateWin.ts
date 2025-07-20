@@ -29,29 +29,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     if (!isValidBody(req.body)) {
         console.log("Checking body")
-        res.status(400).json({ error: "Invalid request body" });
+        res.status(400).json({ message: "Malformed request body" });
         return;
     }
     const { id, visitedUrls } = req.body;
     const activeGame = await getActiveGameFromId(id);
     if (!activeGame) {
         console.log("Active game not found for id:", id);
-        res.status(404).json({ error: "Active game not found" });
+        res.status(404).json({ message: "Game not found" });
         return;
     }
     if (activeGame.userId !== userId) {
         console.log("User does not have permission to validate this game");
-        res.status(403).json({ error: "Forbidden: You do not have permission to validate this game" });
+        res.status(403).json({ message: "Forbidden: You do not have permission to validate this game" });
         return;
     }
     if (!areArticlesTheSame(activeGame.startingArticleUrl, visitedUrls[0])) {
         console.log("First visited URL does not match starting article URL");
-        res.status(400).json({ error: "First visited URL must be the starting article URL" });
+        res.status(400).json({ message: "Invalid sequence of articles found" });
         return;
     }
     if (!areArticlesTheSame(visitedUrls[visitedUrls.length - 1], activeGame.endingArticleUrl)) {
         console.log("Last visited URL does not match ending article URL");
-        res.status(400).json({ error: "Last visited URL must be the ending article URL" });
+        res.status(400).json({ message: "Invalid sequence of articles found" });
         return;
     }
     for (let i = 0; i < visitedUrls.length - 1; i++) {
@@ -65,7 +65,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
         }
         if (!isValid) {
-            res.status(400).json({ error: `Invalid navigation from ${currentUrl} to ${visitedUrls[i + 1]}` });
+            res.status(400).json({ message: `Invalid navigation from ${currentUrl} to ${visitedUrls[i + 1]}` });
             return;
         }
     }

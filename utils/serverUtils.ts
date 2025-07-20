@@ -22,7 +22,7 @@ export async function handleProtectedAuth(req: VercelRequest, res: VercelRespons
     const validated = await verifyTokens({ accessToken, refreshToken: String(refreshToken) })
     if (!validated) {
         setTokenHeaders(res, "", "");
-        res.status(401).json({ error: "Unauthorized" });
+        res.status(401).json({ message: "Unauthorized" });
         return null;
     }
     const { accessToken: newAccessToken, refreshToken: newRefreshToken, userId } = validated;
