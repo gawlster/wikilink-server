@@ -38,7 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return;
     }
     if (newPassword.length < 8) {
-        console.log("New password is too short");
+        console.log("New password is too short for user: ", email);
         res.status(400).json({ message: "Password must be at least 8 characters long" });
         return;
     }

@@ -35,14 +35,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     const { password, confirmPassword, email } = req.body;
     if (password !== confirmPassword) {
-        console.log("Passwords do not match");
         res.status(400).json({ message: "Passwords do not match" });
         return;
     }
 
     const existingUser = await getUserFromEmail(email);
     if (existingUser) {
-        console.log("User with this email already exists");
+        console.log(`User wth email ${email} already exists`);
         res.status(400).json({ message: "User with this email already exists" });
         return;
     }
@@ -59,7 +58,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (password.length < 8) {
-        console.log("Password must be at least 8 characters long");
         res.status(400).json({ message: "Password must be at least 8 characters long" });
         return;
     }

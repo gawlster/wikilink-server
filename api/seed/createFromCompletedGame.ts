@@ -41,12 +41,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return;
     }
     if (completedGame.userId !== userId) {
-        console.log("User does not have permission to access this completed game");
         res.status(403).json({ message: "Forbidden: You do not have permission to access this completed game" });
         return;
     }
     if (completedGame.createdFromSeed) {
-        console.log("This game was already created from a seed. No need to create a new one, return the existing one.");
         try {
             const seededGame = await getSeededGameFromId(completedGame.createdFromSeed);
             if (!seededGame) {

@@ -29,13 +29,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { email, password } = req.body;
     const user = await getUserFromEmail(email);
     if (!user) {
-        console.log("User not found");
+        console.log(`User with email ${email} not found`);
         res.status(404).json({ message: "Email or password is incorrect" });
         return;
     }
     const isValid = await isPasswordValid(user, password);
     if (!isValid) {
-        console.log("Invalid password");
+        console.log("Invalid password for user with email: ", email);
         res.status(401).json({ message: "Email or password is incorrect" });
         return;
     }

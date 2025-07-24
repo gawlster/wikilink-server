@@ -28,7 +28,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return; // handleProtectedAuth already sends a VercelResponse
     }
     if (!isValidBody(req.body)) {
-        console.log("Checking body")
         res.status(400).json({ message: "Malformed request body" });
         return;
     }
@@ -40,17 +39,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return;
     }
     if (activeGame.userId !== userId) {
-        console.log("User does not have permission to validate this game");
         res.status(403).json({ message: "Forbidden: You do not have permission to validate this game" });
         return;
     }
     if (!areArticlesTheSame(activeGame.startingArticleUrl, visitedUrls[0])) {
-        console.log("First visited URL does not match starting article URL");
+        console.log("First visited URL does not match starting article URL for active game: ", id);
         res.status(400).json({ message: "Invalid sequence of articles found" });
         return;
     }
     if (!areArticlesTheSame(visitedUrls[visitedUrls.length - 1], activeGame.endingArticleUrl)) {
-        console.log("Last visited URL does not match ending article URL");
+        console.log("Last visited URL does not match ending article URL for active game: ", id);
         res.status(400).json({ message: "Invalid sequence of articles found" });
         return;
     }
