@@ -30,6 +30,18 @@ export async function createUser(email: string, password: string): Promise<User>
     return user;
 }
 
+export async function updateUserPassword(user: User, newPassword: string): Promise<User> {
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(newPassword, salt);
+    const updatedUser: User = {
+        ...user,
+        passwordHash
+    }
+
+    await saveUser(updatedUser);
+    return updatedUser;
+}
+
 export async function saveUser(user: User): Promise<void> {
     await redis.set(`user:${user.id}`, JSON.stringify(user));
     console.log(`User saved: ${JSON.stringify(user)}`);
@@ -37,7 +49,6 @@ export async function saveUser(user: User): Promise<void> {
 
 export async function getUserFromId(id: string) {
     const raw = await redis.get(`user:${id}`);
-    console.log(`Raw user data for ID ${id}:`, raw);
     if (typeof raw !== "object" || raw === null || !isValidUser(raw)) {
         console.log(`User with ID ${id} not found or malformed`);
         throw new Error(`User with ID ${id} not found or malformed`);

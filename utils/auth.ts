@@ -24,6 +24,24 @@ async function generateRefreshToken(userId: string): Promise<string> {
     return token;
 }
 
+export async function generateResetPasswordCode(userId: string): Promise<string> {
+    const code = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit code
+    await redis.set(`resetCode:${userId}`, code, { ex: 60 * 15 }); // Store code for 15 minutes
+    return code;
+}
+
+export async function verifyResetPasswordCode(userId: string, code: string): Promise<boolean> {
+    const storedCode = await redis.get(`resetCode:${userId}`);
+    if ((storedCode as any).toString() === code) {
+        return true;
+    }
+    return false;
+}
+
+export async function deleteResetPasswordCode(userId: string): Promise<void> {
+    await redis.del(`resetCode:${userId}`);
+}
+
 export async function generateTokens(userId: string): Promise<{ accessToken: string; refreshToken: string }> {
     const accessToken = generateAccessToken(userId);
     const refreshToken = await generateRefreshToken(userId);
