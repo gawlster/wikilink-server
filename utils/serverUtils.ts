@@ -2,7 +2,17 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import { verifyTokens } from "./auth";
 
 export function handleCORS(req: VercelRequest, res: VercelResponse) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    const devExtensionId = "jjpkkoobpafpdfaimchlkilemkophakp";
+    const prodExtensionId = "emkinglnjogipkbdaolejamloekkjboj";
+    const requestOrigin = req.headers.origin;
+    if (!requestOrigin) {
+        return false;
+    }
+    if (requestOrigin.endsWith(devExtensionId)) {
+        res.setHeader("Access-Control-Allow-Origin", `chrome-extension://${devExtensionId}`);
+    } else if (requestOrigin.endsWith(prodExtensionId)) {
+        res.setHeader("Access-Control-Allow-Origin", `chrome-extension://${prodExtensionId}`);
+    }
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-refresh-token");
     res.setHeader("Access-Control-Expose-Headers", "Authorization, x-refresh-token");
@@ -22,7 +32,7 @@ export async function handleProtectedAuth(req: VercelRequest, res: VercelRespons
     const validated = await verifyTokens({ accessToken, refreshToken: String(refreshToken) })
     if (!validated) {
         setTokenHeaders(res, "", "");
-        res.status(401).json({ error: "Unauthorized" });
+        res.status(401).json({ message: "Unauthorized" });
         return null;
     }
     const { accessToken: newAccessToken, refreshToken: newRefreshToken, userId } = validated;

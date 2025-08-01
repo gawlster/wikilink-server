@@ -23,20 +23,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     if (!isValidBody(req.body)) {
         console.log("Invalid request body");
-        res.status(400).json({ error: "Invalid request body" });
+        res.status(400).json({ message: "Malformed request body" });
         return;
     }
     const { email, password } = req.body;
     const user = await getUserFromEmail(email);
     if (!user) {
-        console.log("User not found");
-        res.status(404).json({ error: "User not found" });
+        console.log(`User with email ${email} not found`);
+        res.status(404).json({ message: "Email or password is incorrect" });
         return;
     }
     const isValid = await isPasswordValid(user, password);
     if (!isValid) {
-        console.log("Invalid password");
-        res.status(401).json({ error: "Invalid password" });
+        console.log("Invalid password for user with email: ", email);
+        res.status(401).json({ message: "Email or password is incorrect" });
         return;
     }
     const { accessToken, refreshToken } = await generateTokens(user.id);

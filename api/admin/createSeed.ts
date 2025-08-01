@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return;
     }
     if (!isValidBody(req.body)) {
-        res.status(400).json({ error: "Invalid request body" });
+        res.status(400).json({ message: "Malformed request body" });
         return;
     }
     const { startingArticleUrl, endingArticleUrl, minSteps, category } = req.body;
@@ -38,6 +38,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(201).json(seededGame);
     } catch (error) {
         console.error("Error creating seeded game:", error);
-        res.status(500).json({ error: "Failed to create seeded game" });
+        res.status(500).json({ message: "Failed to create seeded game" });
     }
 }
